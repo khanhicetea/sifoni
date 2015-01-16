@@ -1,0 +1,6 @@
+# Managed by Composer
+/vendor/
+
+# Composer PHAR
+/composer.phar
+/.idea
