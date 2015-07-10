@@ -2,8 +2,10 @@
 
 namespace Sifoni;
 
+use Silex\Provider\HttpFragmentServiceProvider;
 use Silex\Provider\MonologServiceProvider;
 use Silex\Provider\HttpCacheServiceProvider;
+use Silex\Provider\RoutingServiceProvider;
 use Silex\Provider\SessionServiceProvider;
 use Silex\Provider\UrlGeneratorServiceProvider;
 use Silex\Provider\ValidatorServiceProvider;
@@ -132,23 +134,6 @@ class Engine {
     private function registerServices() {
         $app = $this->app;
 
-        if ($app['debug']) {
-            $app->register(new MonologServiceProvider(), array(
-                'monolog.logfile' => $this->getDirPath('log') . DS . 'debug.log',
-            ));
-
-            $app->register(new WebProfilerServiceProvider(), array(
-                'profiler.cache_dir' => $this->getDirPath('cache') . DS . 'profiler' . DS,
-                'profiler.mount_prefix' => '/_profiler',
-            ));
-        }
-
-        if ($app['enabled_http_cache']) {
-            $app->register(new HttpCacheServiceProvider(), array(
-                'http_cache.cache_dir' => $this->getDirPath('cache') . DS,
-            ));
-        }
-
         $app->register(new ServiceControllerServiceProvider());
         $app->register(new UrlGeneratorServiceProvider());
         $app->register(new ValidatorServiceProvider());
@@ -164,8 +149,30 @@ class Engine {
                 'cookie_httponly' => true
             )
         ));
-
         $app->register(new CapsuleServiceProvider(), $app['config.database.parameters']);
+        $app->register(new MonologServiceProvider(), array(
+            'monolog.logfile' => $this->getDirPath('log') . DS . ($app['debug'] ? 'debug.log' : 'production.log'),
+        ));
+
+        if ($app['debug']) {
+            if (!isset($app['fragment.handler'])) {
+                $app->register(new HttpFragmentServiceProvider());
+            }
+            if (!isset($app['routing.listener'])) {
+                $app->register(new RoutingServiceProvider());
+            }
+            
+            $app->register(new WebProfilerServiceProvider(), array(
+                'profiler.cache_dir' => $this->getDirPath('cache') . DS . 'profiler' . DS,
+                'profiler.mount_prefix' => '/_profiler',
+            ));
+        }
+
+        if ($app['enabled_http_cache']) {
+            $app->register(new HttpCacheServiceProvider(), array(
+                'http_cache.cache_dir' => $this->getDirPath('cache') . DS,
+            ));
+        }
     }
 
     private function loadHooks() {

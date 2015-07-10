@@ -13,7 +13,7 @@ class CapsuleServiceProvider implements ServiceProviderInterface
 {
     /**
      * Register the Capsule service.
-     * See: http://stackoverflow.com/questions/17105829/using-eloquent-orm-from-laravel-4-outside-of-laravel
+     * Ref: http://stackoverflow.com/questions/17105829/using-eloquent-orm-from-laravel-4-outside-of-laravel
      *
      * @param $app
      **/
@@ -30,9 +30,6 @@ class CapsuleServiceProvider implements ServiceProviderInterface
             'prefix' => null,
             'logging' => false,
         );
-
-        $app['capsule.global'] = true;
-        $app['capsule.eloquent'] = true;
 
         $app['capsule.container'] = $app->share(function () {
             return new Container;
@@ -58,14 +55,6 @@ class CapsuleServiceProvider implements ServiceProviderInterface
                 foreach ($app['capsule.cache'] as $key => $value) {
                     $app['capsule.container']->offsetGet('config')->offsetSet('cache.' . $key, $value);
                 }
-            }
-
-            if ($app['capsule.global']) {
-                $capsule->setAsGlobal();
-            }
-
-            if ($app['capsule.eloquent']) {
-                $capsule->bootEloquent();
             }
 
             if (!isset($app['capsule.connections'])) {
@@ -99,10 +88,6 @@ class CapsuleServiceProvider implements ServiceProviderInterface
      **/
     public function boot(Application $app)
     {
-        if ($app['capsule.eloquent']) {
-            $app->before(function () use ($app) {
-                $app['capsule'];
-            }, Application::EARLY_EVENT);
-        }
+        // Do nothing here
     }
 }

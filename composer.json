@@ -10,24 +10,25 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "silex/silex": "~1.2",
-        "symfony/form": "~2.6",
-        "symfony/security-csrf": "~2.6",
-        "symfony/security": "~2.6",
-        "symfony/validator": "~2.6",
-        "symfony/translation": "~2.6",
-        "symfony/twig-bridge": "~2.6",
+        "php": ">=5.5.9",
+        "silex/silex": "~2.0@dev",
+        "symfony/form": "~2.7",
+        "symfony/security-csrf": "~2.7",
+        "symfony/security": "~2.7",
+        "symfony/validator": "~2.7",
+        "symfony/translation": "~2.7",
+        "symfony/twig-bridge": "~2.7",
         "monolog/monolog": "~1.0",
         "twig/twig": "~1.17",
-        "swiftmailer/swiftmailer": "~5.3",
-        "illuminate/database": "~4.2",
-        "illuminate/events": "~4.2",
-        "illuminate/container": "~4.2",
-        "illuminate/cache": "~4.2"
+        "swiftmailer/swiftmailer": "~5.4",
+        "illuminate/database": "~5.1",
+        "illuminate/events": "~5.1",
+        "illuminate/container": "~5.1",
+        "illuminate/cache": "~5.1"
     },
     "require-dev": {
-        "silex/web-profiler": "~1.0"
+        "silex/web-profiler": "~2.0@dev",
+        "symfony/monolog-bridge": "~2.7"
     },
     "autoload": {
         "psr-0": {
