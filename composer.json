@@ -11,7 +11,7 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "silex/silex": "~2.0@dev",
+        "silex/silex": "2.0.x-dev",
         "symfony/form": "~2.7",
         "symfony/security-csrf": "~2.7",
         "symfony/security": "~2.7",
