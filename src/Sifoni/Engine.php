@@ -9,7 +9,6 @@ use Silex\Provider\UrlGeneratorServiceProvider;
 use Silex\Provider\ValidatorServiceProvider;
 use Silex\Provider\FormServiceProvider;
 use Silex\Provider\TwigServiceProvider;
-use Silex\Provider\WebProfilerServiceProvider;
 use Silex\Provider\ServiceControllerServiceProvider;
 use Silex\Provider\TranslationServiceProvider;
 use Sifoni\Provider\CapsuleServiceProvider;
@@ -119,7 +118,7 @@ class Engine {
     private function loadConfig($file_name) {
         $file_path = $this->getDirPath('config') . DS . $file_name . EXT;
 
-        if (is_readable($file_name)) {
+        if (is_readable($file_path)) {
             $configs = require ($file_path);
             foreach ($configs as $key => $value) {
                 $this->app['config.' . $file_name . '.' . $key] = $value;
@@ -153,7 +152,7 @@ class Engine {
         ));
 
         if ($app['debug']) {
-            $app->register(new WebProfilerServiceProvider(), array(
+            $app->register(new \Silex\Provider\WebProfilerServiceProvider(), array(
                 'profiler.cache_dir' => $this->getDirPath('cache') . DS . 'profiler' . DS,
                 'profiler.mount_prefix' => '/_profiler',
             ));
