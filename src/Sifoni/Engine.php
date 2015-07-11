@@ -82,6 +82,7 @@ class Engine {
 
         $default_options = array(
             'env' => static::ENV_DEV,
+            'enabled_http_cache' => false,
             'http_cache' => false,
             'dir.app' => 'app',
             'dir.config' => 'config',
