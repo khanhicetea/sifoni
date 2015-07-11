@@ -233,7 +233,7 @@ class Engine {
 
                 $tmp = $map->match($pattern, $controller_name . '::' . $action)->bind($bind_name);
 
-                if (isset($targets[3])) {
+                if (!empty($targets[3])) {
                     $defaults = explode(',', $targets[3]);
                     foreach ($defaults as $default) {
                         $values = explode('=', $default);
