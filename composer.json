@@ -20,6 +20,7 @@
         "symfony/twig-bridge": "~2.7,<2.8",
         "monolog/monolog": "~1.0",
         "twig/twig": "~1.17",
+        "silex/web-profiler": "~1.0",
         "swiftmailer/swiftmailer": "~5.4",
         "illuminate/database": "~5.1",
         "illuminate/events": "~5.1",
@@ -27,7 +28,6 @@
         "illuminate/cache": "~5.1"
     },
     "require-dev": {
-        "silex/web-profiler": "~1.0",
         "symfony/monolog-bridge": "~2.7,<2.8"
     },
     "autoload": {

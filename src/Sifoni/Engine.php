@@ -11,6 +11,7 @@ use Silex\Provider\FormServiceProvider;
 use Silex\Provider\TwigServiceProvider;
 use Silex\Provider\ServiceControllerServiceProvider;
 use Silex\Provider\TranslationServiceProvider;
+use Silex\Provider\WebProfilerServiceProvider;
 use Sifoni\Provider\CapsuleServiceProvider;
 
 class Engine {
@@ -152,7 +153,7 @@ class Engine {
         ));
 
         if ($app['debug']) {
-            $app->register(new \Silex\Provider\WebProfilerServiceProvider(), array(
+            $app->register(new WebProfilerServiceProvider(), array(
                 'profiler.cache_dir' => $this->getDirPath('cache') . DS . 'profiler' . DS,
                 'profiler.mount_prefix' => '/_profiler',
             ));
