@@ -11,6 +11,7 @@ use Silex\Provider\FormServiceProvider;
 use Silex\Provider\TwigServiceProvider;
 use Silex\Provider\ServiceControllerServiceProvider;
 use Silex\Provider\TranslationServiceProvider;
+use Silex\Provider\HttpFragmentServiceProvider;
 use Silex\Provider\WebProfilerServiceProvider;
 use Sifoni\Provider\CapsuleServiceProvider;
 
@@ -137,6 +138,7 @@ class Engine {
         $app->register(new UrlGeneratorServiceProvider());
         $app->register(new ValidatorServiceProvider());
         $app->register(new FormServiceProvider());
+        $app->register(new HttpFragmentServiceProvider());
         $app->register(new TwigServiceProvider(), array(
             'twig.path' => $this->getDirPath('view'),
         ));
