@@ -2,10 +2,8 @@
 
 namespace Sifoni;
 
-use Silex\Provider\HttpFragmentServiceProvider;
 use Silex\Provider\MonologServiceProvider;
 use Silex\Provider\HttpCacheServiceProvider;
-use Silex\Provider\RoutingServiceProvider;
 use Silex\Provider\SessionServiceProvider;
 use Silex\Provider\UrlGeneratorServiceProvider;
 use Silex\Provider\ValidatorServiceProvider;
@@ -111,7 +109,7 @@ class Engine {
      */
     public function getDirPath($name) {
         $dir_name = isset($this->app['dir.' . $name]) ? $this->app['dir.' . $name] : $name;
-        return $this->app['path.root'] . DS . $dir_name;
+        return $this->app['path.root'] . DS . $this->app['dir.app'] . DS . $dir_name;
     }
 
     /**
@@ -155,13 +153,6 @@ class Engine {
         ));
 
         if ($app['debug']) {
-            if (!isset($app['fragment.handler'])) {
-                $app->register(new HttpFragmentServiceProvider());
-            }
-            if (!isset($app['routing.listener'])) {
-                $app->register(new RoutingServiceProvider());
-            }
-            
             $app->register(new WebProfilerServiceProvider(), array(
                 'profiler.cache_dir' => $this->getDirPath('cache') . DS . 'profiler' . DS,
                 'profiler.mount_prefix' => '/_profiler',

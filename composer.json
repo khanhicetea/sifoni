@@ -11,7 +11,7 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "silex/silex": "~2.0@dev",
+        "silex/silex": "~1.3",
         "symfony/form": "~2.7,<2.8",
         "symfony/security-csrf": "~2.7,<2.8",
         "symfony/security": "~2.7,<2.8",
@@ -27,7 +27,7 @@
         "illuminate/cache": "~5.1"
     },
     "require-dev": {
-        "silex/web-profiler": "~2.0@dev",
+        "silex/web-profiler": "~1.0",
         "symfony/monolog-bridge": "~2.7,<2.8"
     },
     "autoload": {
