@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Sifoni\Engine;
 
 // Enable Eloquent
-$app = Engine::getInstance();
+$app = Engine::getInstance()->getApp();
 $app['capsule.eloquent'] = true;
 $app['capsule']->bootEloquent();
 

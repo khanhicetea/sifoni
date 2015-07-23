@@ -71,9 +71,9 @@ class CapsuleServiceProvider implements ServiceProviderInterface
                 $capsule->addConnection($options, $connection);
 
                 if ($logging) {
-                    $capsule->connection($connection)->enableQueryLog();
+                    $capsule->getConnection($connection)->enableQueryLog();
                 } else {
-                    $capsule->connection($connection)->disableQueryLog();
+                    $capsule->getConnection($connection)->disableQueryLog();
                 }
             }
 
