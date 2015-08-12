@@ -4,6 +4,7 @@ namespace Sifoni\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 use Sifoni\Engine;
+use Symfony\Component\Security\Csrf\CsrfToken;
 
 class Base {
     protected $app = null;
@@ -54,6 +55,7 @@ class Base {
     }
 
     public function isFormValid($action = '', $token_name = '_token') {
-        return $this->app['form.csrf_provider']->isCsrfTokenValid($action, $this->request->get($token_name));
+        $token = new CsrfToken($action, $this->request->get($token_name));
+        return $this->app['form.csrf_provider']->isTokenValid($token);
     }
 }
