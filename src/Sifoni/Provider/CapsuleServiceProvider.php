@@ -4,7 +4,7 @@ namespace Sifoni\Provider;
 
 use Silex\Application;
 use Silex\ServiceProviderInterface;
-use Illuminate\Database\Capsule\Manager as Capsule;
+use Sifoni\Model\DB;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
 use Illuminate\Cache\CacheManager;
@@ -46,7 +46,7 @@ class CapsuleServiceProvider implements ServiceProviderInterface
         }
 
         $app['capsule'] = $app->share(function ($app) {
-            $capsule = new Capsule($app['capsule.container']);
+            $capsule = new DB($app['capsule.container']);
             $capsule->setEventDispatcher($app['capsule.dispatcher']);
 
             if (isset($app['capsule.cache_manager']) && isset($app['capsule.cache'])) {
