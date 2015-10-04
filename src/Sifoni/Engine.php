@@ -83,6 +83,8 @@ class Engine {
 
         $default_options = array(
             'env' => static::ENV_DEV,
+            'timezone' => 'Asia/Ho_Chi_Minh', // I <3 Vietnam
+            'web_profiler' => true,
             'enabled_http_cache' => false,
             'http_cache' => false,
             'dir.app' => 'app',
@@ -155,7 +157,7 @@ class Engine {
             'monolog.logfile' => $this->getDirPath('log') . DS . ($app['debug'] ? 'debug.log' : 'production.log'),
         ));
 
-        if ($app['debug']) {
+        if ($app['debug'] && $app['web_profiler']) {
             $app->register(new WebProfilerServiceProvider(), array(
                 'profiler.cache_dir' => $this->getDirPath('cache') . DS . 'profiler' . DS,
                 'profiler.mount_prefix' => '/_profiler',
@@ -230,8 +232,9 @@ class Engine {
                 $controller_name = $app_controller_prefix . str_replace('_', '\\', $targets[0]);
                 $action = $targets[1] . 'Action';
                 $bind_name = isset($targets[2]) ? $targets[2] : strtolower($targets[0] . '_' . $targets[1]);
+                $method = isset($targets[4]) ? strtolower($targets[4]) : 'match';
 
-                $tmp = $map->match($pattern, $controller_name . '::' . $action)->bind($bind_name);
+                $tmp = $map->$method($pattern, $controller_name . '::' . $action)->bind($bind_name);
 
                 if (!empty($targets[3])) {
                     $defaults = explode(',', $targets[3]);
@@ -242,10 +245,7 @@ class Engine {
                 }
 
                 if ($prefix_locale != '' && $prefix == '/' && $pattern == '/') {
-                    $match = $app->match('/', $controller_name . '::' . $action);
-                    if (isset($targets[4])) {
-                        $match->method(strtoupper($targets[4]));
-                    }
+                    $app->$method('/', $controller_name . '::' . $action);
                 }
             }
 
@@ -254,6 +254,8 @@ class Engine {
     }
 
     public function start() {
+        date_default_timezone_set($this->app['timezone']);
+        
         $this->loadConfig('app');
         $this->loadConfig('database');
         $this->registerServices();

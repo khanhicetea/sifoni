@@ -40,18 +40,26 @@ class Base {
     public function redirect($named_route, $params = array()) {
         return $this->app->redirect($this->app->url($named_route, $params));
     }
-
-    public function redirectWithFlash($named_route, $params = array(), $flash_type, $flash_content) {
+    
+    public function addFlashMessage($flash_type, $flash_content) {
         $this->app['session']->getFlashBag()->add('message', array(
             'type' => $flash_type,
             'content' => $flash_content
         ));
+    }
+
+    public function redirectWithFlash($named_route, $params = array(), $flash_type, $flash_content) {
+        $this->addFlashMessage($flash_type, $flash_content);
 
         return $this->app->redirect($this->app->url($named_route, $params));
     }
 
-    public function getPostData() {
-        return $this->request->request->all();
+    public function getPostData($field = null, $default = null) {
+        return empty($field) ? $this->request->request->all() : $this->request->request->get($field, $default);
+    }
+
+    public function getQueryParam($field = null, $default = null) {
+        return empty($field) ? $this->request->query->all() : $this->request->query->get($field, $default);
     }
 
     public function isFormValid($action = '', $token_name = '_token') {
