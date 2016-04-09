@@ -4,7 +4,7 @@
  * @author Filipe Dobreira <http://github.com/filp>
  */
 
-namespace Whoops\Provider\Silex;
+namespace Sifoni\Provider;
 
 use RuntimeException;
 use Silex\Application;
