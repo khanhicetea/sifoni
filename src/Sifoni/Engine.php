@@ -15,6 +15,7 @@ use Silex\Provider\HttpFragmentServiceProvider;
 use Silex\Provider\WebProfilerServiceProvider;
 use Sifoni\Provider\CapsuleServiceProvider;
 use Sifoni\Provider\WhoopsServiceProvider;
+use Monolog\Logger;
 
 class Engine {
     const ENV_DEV = 'DEV';
@@ -89,6 +90,7 @@ class Engine {
             'enabled_http_cache' => false,
             'http_cache' => false,
             'dir.app' => 'app',
+            'dir.storage' => 'storage',
             'dir.config' => 'config',
             'dir.cache' => 'cache',
             'dir.log' => 'log',
@@ -115,6 +117,15 @@ class Engine {
     public function getDirPath($name) {
         $dir_name = isset($this->app['dir.' . $name]) ? $this->app['dir.' . $name] : $name;
         return $this->app['path.root'] . DS . $this->app['dir.app'] . DS . $dir_name;
+    }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    public function getStoragePath($name) {
+        $dir_name = isset($this->app['dir.' . $name]) ? $this->app['dir.' . $name] : $name;
+        return $this->app['path.root'] . DS . $this->app['dir.storage'] . DS . $dir_name;
     }
 
     /**
@@ -155,7 +166,7 @@ class Engine {
         ));
         $app->register(new CapsuleServiceProvider(), $app['config.database.parameters']);
         $app->register(new MonologServiceProvider(), array(
-            'monolog.logfile' => $this->getDirPath('log') . DS . ($app['debug'] ? 'debug.log' : 'production.log'),
+            'monolog.logfile' => $this->getStoragePath('log') . DS . ($app['debug'] ? 'debug.log' : 'production.log'),
         ));
 
         if ($app['debug']) {
@@ -163,15 +174,19 @@ class Engine {
 
             if ($app['web_profiler']) {
                 $app->register(new WebProfilerServiceProvider(), array(
-                    'profiler.cache_dir' => $this->getDirPath('cache') . DS . 'profiler' . DS,
+                    'profiler.cache_dir' => $this->getStoragePath('cache') . DS . 'profiler' . DS,
                     'profiler.mount_prefix' => '/_profiler',
                 ));
             }
+        } else {
+            $app['monolog.level'] = function () {
+                return Logger::ERROR;
+            };
         }
 
         if ($app['enabled_http_cache']) {
             $app->register(new HttpCacheServiceProvider(), array(
-                'http_cache.cache_dir' => $this->getDirPath('cache') . DS,
+                'http_cache.cache_dir' => $this->getStoragePath('cache') . DS,
             ));
         }
     }
