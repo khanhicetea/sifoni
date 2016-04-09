@@ -14,6 +14,7 @@ use Silex\Provider\TranslationServiceProvider;
 use Silex\Provider\HttpFragmentServiceProvider;
 use Silex\Provider\WebProfilerServiceProvider;
 use Sifoni\Provider\CapsuleServiceProvider;
+use Sifoni\Provider\WhoopsServiceProvider;
 
 class Engine {
     const ENV_DEV = 'DEV';
@@ -157,11 +158,15 @@ class Engine {
             'monolog.logfile' => $this->getDirPath('log') . DS . ($app['debug'] ? 'debug.log' : 'production.log'),
         ));
 
-        if ($app['debug'] && $app['web_profiler']) {
-            $app->register(new WebProfilerServiceProvider(), array(
-                'profiler.cache_dir' => $this->getDirPath('cache') . DS . 'profiler' . DS,
-                'profiler.mount_prefix' => '/_profiler',
-            ));
+        if ($app['debug']) {
+            $app->register(new WhoopsServiceProvider());
+
+            if ($app['web_profiler']) {
+                $app->register(new WebProfilerServiceProvider(), array(
+                    'profiler.cache_dir' => $this->getDirPath('cache') . DS . 'profiler' . DS,
+                    'profiler.mount_prefix' => '/_profiler',
+                ));
+            }
         }
 
         if ($app['enabled_http_cache']) {

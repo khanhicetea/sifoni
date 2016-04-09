@@ -25,7 +25,8 @@
         "illuminate/database": "~5.2",
         "illuminate/events": "~5.2",
         "illuminate/container": "~5.2",
-        "illuminate/cache": "~5.2"
+        "illuminate/cache": "~5.2",
+        "filp/whoops": "2.*"
     },
     "require-dev": {
         "symfony/monolog-bridge": "~2.7|3.0.*"
