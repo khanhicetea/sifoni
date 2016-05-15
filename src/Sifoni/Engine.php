@@ -85,6 +85,7 @@ class Engine {
 
         $default_options = array(
             'env' => static::ENV_DEV,
+            'logging' => true,
             'timezone' => 'Asia/Ho_Chi_Minh', // I <3 Vietnam
             'web_profiler' => true,
             'enabled_http_cache' => false,
@@ -105,7 +106,9 @@ class Engine {
             $this->app[$key] = $value;
         }
 
-        $this->app['debug'] = ($this->app['env'] != static::ENV_PROD);
+        if (!isset($this->app['debug'])) {
+            $this->app['debug'] = ($this->app['env'] != static::ENV_PROD);
+        }
 
         return $this;
     }
@@ -165,9 +168,12 @@ class Engine {
             )
         ));
         $app->register(new CapsuleServiceProvider(), $app['config.database.parameters']);
-        $app->register(new MonologServiceProvider(), array(
-            'monolog.logfile' => $this->getStoragePath('log') . DS . ($app['debug'] ? 'debug.log' : 'production.log'),
-        ));
+
+        if ($app['logging']) {
+            $app->register(new MonologServiceProvider(), array(
+                'monolog.logfile' => $this->getStoragePath('log') . DS . ($app['debug'] ? 'debug.log' : 'production.log'),
+            ));
+        }
 
         if ($app['debug']) {
             $app->register(new WhoopsServiceProvider());
@@ -178,7 +184,7 @@ class Engine {
                     'profiler.mount_prefix' => '/_profiler',
                 ));
             }
-        } else {
+        } elseif ($app['logging']) {
             $app['monolog.level'] = function () {
                 return Logger::ERROR;
             };
@@ -275,7 +281,7 @@ class Engine {
 
     public function start() {
         date_default_timezone_set($this->app['timezone']);
-        
+
         $this->loadConfig('app');
         $this->loadConfig('database');
         $this->registerServices();
