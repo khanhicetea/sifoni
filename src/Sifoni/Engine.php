@@ -4,7 +4,6 @@ namespace Sifoni;
 
 use Silex\Provider\MonologServiceProvider;
 use Silex\Provider\HttpCacheServiceProvider;
-use Silex\Provider\SessionServiceProvider;
 use Silex\Provider\UrlGeneratorServiceProvider;
 use Silex\Provider\ValidatorServiceProvider;
 use Silex\Provider\FormServiceProvider;
@@ -15,6 +14,7 @@ use Silex\Provider\HttpFragmentServiceProvider;
 use Silex\Provider\WebProfilerServiceProvider;
 use Sifoni\Provider\CapsuleServiceProvider;
 use Sifoni\Provider\WhoopsServiceProvider;
+use Sifoni\Provider\SessionServiceProvider;
 use Monolog\Logger;
 
 class Engine {
