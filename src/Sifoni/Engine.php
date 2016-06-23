@@ -4,7 +4,6 @@ namespace Sifoni;
 
 use Silex\Provider\MonologServiceProvider;
 use Silex\Provider\HttpCacheServiceProvider;
-use Silex\Provider\UrlGeneratorServiceProvider;
 use Silex\Provider\TwigServiceProvider;
 use Silex\Provider\ServiceControllerServiceProvider;
 use Silex\Provider\TranslationServiceProvider;
@@ -12,7 +11,6 @@ use Silex\Provider\HttpFragmentServiceProvider;
 use Silex\Provider\WebProfilerServiceProvider;
 use Silex\Provider\LocaleServiceProvider;
 use Sifoni\Provider\CapsuleServiceProvider;
-use Sifoni\Provider\WhoopsServiceProvider;
 use Sifoni\Provider\SessionServiceProvider;
 use Monolog\Logger;
 
@@ -94,6 +92,7 @@ class Engine
             'enabled_http_cache' => false,
             'enabled_twig' => true,
             'enabled_session' => true,
+            'enabled_database' => true,
             'dir.app' => 'app',
             'dir.storage' => 'storage',
             'app.vendor_name' => 'App',
@@ -134,7 +133,7 @@ class Engine
      */
     private function loadConfig($file_name)
     {
-        $file_path = $this->getAppPath('config').DIRECTORY_SEPARATOR.$file_name.EXT;
+        $file_path = $this->getAppPath('config').DIRECTORY_SEPARATOR.$file_name.'.php';
 
         if (is_readable($file_path)) {
             $configs = require $file_path;
@@ -151,7 +150,10 @@ class Engine
         $app = $this->app;
 
         $app->register(new ServiceControllerServiceProvider());
-        $app->register(new UrlGeneratorServiceProvider());
+
+        $app['request'] = $app->factory(function($c) {
+            return $c['request_stack']->getCurrentRequest();
+        });
 
         if ($app['logging']) {
             $app->register(new MonologServiceProvider(), array(
@@ -162,17 +164,6 @@ class Engine
                 $app['monolog.level'] = function () {
                     return Logger::ERROR;
                 };
-            }
-        }
-
-        if ($app['debug']) {
-            $app->register(new WhoopsServiceProvider());
-
-            if ($app['web_profiler']) {
-                $app->register(new WebProfilerServiceProvider(), array(
-                    'profiler.cache_dir' => $this->getStoragePath('cache').DIRECTORY_SEPARATOR.'profiler'.DIRECTORY_SEPARATOR,
-                    'profiler.mount_prefix' => '/_profiler',
-                ));
             }
         }
 
@@ -199,11 +190,21 @@ class Engine
                 'http_cache.cache_dir' => $this->getStoragePath('cache').DIRECTORY_SEPARATOR,
             ));
         }
+
+        if ($app['debug']) {
+            if ($app['web_profiler']) {
+                $app->register(new WebProfilerServiceProvider(), array(
+                    'profiler.cache_dir' => $this->getStoragePath('cache').DIRECTORY_SEPARATOR.'profiler'.DIRECTORY_SEPARATOR,
+                    'profiler.mount_prefix' => '/_profiler',
+                ));
+            }
+        }
+
     }
 
     private function loadHooks()
     {
-        $file_path = $this->getAppPath('config').DIRECTORY_SEPARATOR.'hook'.EXT;
+        $file_path = $this->getAppPath('config').DIRECTORY_SEPARATOR.'hook.php';
         if (is_readable($file_path)) {
             include_once $file_path;
         }
@@ -219,15 +220,12 @@ class Engine
         $languages = $app['config.app.languages'];
         $app['multi_languages'] = count($languages) > 1;
 
-        if ($app['multi_languages']) {
-            $app->register(new LocaleServiceProvider());
-        }
-
+        $app->register(new LocaleServiceProvider());
         $app->register(new TranslationServiceProvider(), array(
             'locale_fallbacks' => $languages,
         ));
 
-        $app['translator.domains'] = $app->share(function () use ($app, $engine) {
+        $app['translator.domains'] = function () use ($app, $engine) {
             $translator_domains = array(
                 'messages' => array(),
                 'validators' => array(),
@@ -235,15 +233,15 @@ class Engine
             $languages = $app['config.app.languages'];
 
             foreach ($languages as $language) {
-                if (is_readable($engine->getAppPath('language').DIRECTORY_SEPARATOR.strtolower($language).EXT)) {
-                    $trans = include $engine->getAppPath('language').DIRECTORY_SEPARATOR.strtolower($language).EXT;
+                if (is_readable($engine->getAppPath('language').DIRECTORY_SEPARATOR.strtolower($language).'.php')) {
+                    $trans = include $engine->getAppPath('language').DIRECTORY_SEPARATOR.strtolower($language).'.php';
                     $translator_domains['messages'][$language] = $trans['messages'];
                     $translator_domains['validators'][$language] = $trans['validators'];
                 }
             }
 
             return $translator_domains;
-        });
+        };
     }
 
     /**
@@ -254,7 +252,7 @@ class Engine
         $app = $this->app;
         $maps = array();
 
-        $routing_file_path = $this->getAppPath('config').DIRECTORY_SEPARATOR.'routing'.EXT;
+        $routing_file_path = $this->getAppPath('config').DIRECTORY_SEPARATOR.'routing.php';
         if (is_readable($routing_file_path)) {
             $maps = require_once $routing_file_path;
         }

@@ -3,11 +3,12 @@
 namespace Sifoni\Provider;
 
 use Silex\Application;
-use Silex\ServiceProviderInterface;
-use Sifoni\Model\DB;
+use Pimple\Container as PimpleContainer;
+use Pimple\ServiceProviderInterface;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
 use Illuminate\Cache\CacheManager;
+use Sifoni\Model\DB;
 
 class CapsuleServiceProvider implements ServiceProviderInterface
 {
@@ -17,7 +18,7 @@ class CapsuleServiceProvider implements ServiceProviderInterface
      *
      * @param $app
      **/
-    public function register(Application $app)
+    public function register(PimpleContainer $app)
     {
         $app['capsule.connection_defaults'] = array(
             'driver' => 'mysql',
@@ -31,21 +32,21 @@ class CapsuleServiceProvider implements ServiceProviderInterface
             'logging' => false,
         );
 
-        $app['capsule.container'] = $app->share(function () {
+        $app['capsule.container'] = function () {
             return new Container();
-        });
+        };
 
-        $app['capsule.dispatcher'] = $app->share(function () use ($app) {
+        $app['capsule.dispatcher'] = function () use ($app) {
             return new Dispatcher($app['capsule.container']);
-        });
+        };
 
         if (class_exists('Illuminate\Cache\CacheManager')) {
-            $app['capsule.cache_manager'] = $app->share(function () use ($app) {
+            $app['capsule.cache_manager'] = function () use ($app) {
                 return new CacheManager($app['capsule.container']);
-            });
+            };
         }
 
-        $app['capsule'] = $app->share(function ($app) {
+        $app['capsule'] = function ($app) {
             $capsule = new DB($app['capsule.container']);
             $capsule->setEventDispatcher($app['capsule.dispatcher']);
 
@@ -78,7 +79,7 @@ class CapsuleServiceProvider implements ServiceProviderInterface
             }
 
             return $capsule;
-        });
+        };
     }
 
     /**
