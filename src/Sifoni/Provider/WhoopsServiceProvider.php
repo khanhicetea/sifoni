@@ -1,6 +1,7 @@
 <?php
 /**
- * Whoops - php errors for cool kids
+ * Whoops - php errors for cool kids.
+ *
  * @author Filipe Dobreira <http://github.com/filp>
  */
 
@@ -41,7 +42,7 @@ class WhoopsServiceProvider implements ServiceProviderInterface
         $app['whoops.silex_info_handler'] = $app->protect(function () use ($app) {
             try {
                 /** @var Request $request */
-                $request = $app['request'];
+                $request = $app['request_stack']->getCurrentRequest();
             } catch (RuntimeException $e) {
                 // This error occurred too early in the application's life
                 // and the request instance is not yet available.
@@ -49,33 +50,33 @@ class WhoopsServiceProvider implements ServiceProviderInterface
             }
 
             /** @var Handler $errorPageHandler */
-            $errorPageHandler = $app["whoops.error_page_handler"];
+            $errorPageHandler = $app['whoops.error_page_handler'];
 
             if ($errorPageHandler instanceof PrettyPageHandler) {
-                /** @var PrettyPageHandler $errorPageHandler */
+                /* @var PrettyPageHandler $errorPageHandler */
 
                 // General application info:
                 $errorPageHandler->addDataTable('Silex Application', array(
-                    'Charset'          => $app['charset'],
-                    'Locale'           => $app['locale'],
-                    'Route Class'      => $app['route_class'],
+                    'Charset' => $app['charset'],
+                    'Locale' => $app['locale'],
+                    'Route Class' => $app['route_class'],
                     'Dispatcher Class' => $app['dispatcher_class'],
                     'Application Class' => get_class($app),
                 ));
 
                 // Request info:
                 $errorPageHandler->addDataTable('Silex Application (Request)', array(
-                    'URI'         => $request->getUri(),
+                    'URI' => $request->getUri(),
                     'Request URI' => $request->getRequestUri(),
-                    'Path Info'   => $request->getPathInfo(),
+                    'Path Info' => $request->getPathInfo(),
                     'Query String' => $request->getQueryString() ?: '<none>',
                     'HTTP Method' => $request->getMethod(),
                     'Script Name' => $request->getScriptName(),
-                    'Base Path'   => $request->getBasePath(),
-                    'Base URL'    => $request->getBaseUrl(),
-                    'Scheme'      => $request->getScheme(),
-                    'Port'        => $request->getPort(),
-                    'Host'        => $request->getHost(),
+                    'Base Path' => $request->getBasePath(),
+                    'Base URL' => $request->getBaseUrl(),
+                    'Scheme' => $request->getScheme(),
+                    'Port' => $request->getPort(),
+                    'Host' => $request->getHost(),
                 ));
             }
         });
@@ -85,6 +86,7 @@ class WhoopsServiceProvider implements ServiceProviderInterface
             $run->allowQuit(false);
             $run->pushHandler($app['whoops.error_page_handler']);
             $run->pushHandler($app['whoops.silex_info_handler']);
+
             return $run;
         });
 

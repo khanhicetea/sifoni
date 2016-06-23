@@ -56,7 +56,12 @@ class SessionServiceProvider extends SilexSessionServiceProvider
             return new MockFileSessionStorage();
         });
 
-        $app['session.storage.options'] = array();
+        $app['session.storage.options'] = array(
+            'name' => 'Sifoni_Session',
+            'cookie_lifetime' => 0,
+            'cookie_path' => '/',
+            'cookie_httponly' => true,
+        );
         $app['session.default_locale'] = 'en';
         $app['session.storage.save_path'] = null;
     }
@@ -112,5 +117,4 @@ class SessionServiceProvider extends SilexSessionServiceProvider
             $app['dispatcher']->addListener(KernelEvents::RESPONSE, array($this, 'onKernelResponse'), -128);
         }
     }
-
 }

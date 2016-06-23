@@ -5,11 +5,11 @@ namespace Sifoni\Adapter;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 
-class SifoniSessionStorage extends NativeSessionStorage {
+class SifoniSessionStorage extends NativeSessionStorage
+{
+    protected $options = [];
 
-	protected $options = [];
-
-	public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)
+    public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)
     {
         session_cache_limiter('');
         session_register_shutdown();
@@ -18,8 +18,9 @@ class SifoniSessionStorage extends NativeSessionStorage {
         $this->setSaveHandler($handler);
     }
 
-    public function start() {
-    	if ($this->started) {
+    public function start()
+    {
+        if ($this->started) {
             return true;
         }
         if (\PHP_SESSION_ACTIVE === session_status()) {
@@ -32,10 +33,12 @@ class SifoniSessionStorage extends NativeSessionStorage {
             throw new \RuntimeException('Failed to start the session');
         }
         $this->loadSession();
+
         return true;
     }
 
-    public function regenerate($destroy = false, $lifetime = null) {
+    public function regenerate($destroy = false, $lifetime = null)
+    {
         if (\PHP_SESSION_ACTIVE !== session_status()) {
             return false;
         }
@@ -47,6 +50,7 @@ class SifoniSessionStorage extends NativeSessionStorage {
         }
         $isRegenerated = session_regenerate_id($destroy);
         $this->loadSession();
+
         return $isRegenerated;
     }
 
