@@ -4,7 +4,6 @@ namespace Sifoni\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 use Sifoni\Engine;
-use Symfony\Component\Security\Csrf\CsrfToken;
 
 abstract class Base
 {
@@ -16,7 +15,7 @@ abstract class Base
     {
         $this->app = $app = Engine::getInstance()->getApp();
         $this->request = $app['request'];
-        $this->response = new Response(null, Response::HTTP_OK, array());
+        $this->response = new Response(null, Response::HTTP_OK, []);
     }
 
     public function setTtl($time)
@@ -34,30 +33,30 @@ abstract class Base
         $this->response->setSharedMaxAge($time);
     }
 
-    public function render($view, array $parameters = array())
+    public function render($view, array $parameters = [])
     {
         return $this->app->render($view, $parameters, $this->response);
     }
 
-    public function json($data = array(), $status = Response::HTTP_OK, array $headers = array())
+    public function json($data = [], $status = Response::HTTP_OK, array $headers = [])
     {
         return $this->app->json($data, $status, $headers);
     }
 
-    public function redirect($named_route, $params = array())
+    public function redirect($named_route, $params = [])
     {
         return $this->app->redirect($this->app->url($named_route, $params));
     }
 
     public function addFlashMessage($flash_type, $flash_content)
     {
-        $this->app['session']->getFlashBag()->add('message', array(
+        $this->app['session']->getFlashBag()->add('message', [
             'type' => $flash_type,
             'content' => $flash_content,
-        ));
+        ]);
     }
 
-    public function redirectWithFlash($named_route, $params = array(), $flash_type, $flash_content)
+    public function redirectWithFlash($named_route, $params = [], $flash_type, $flash_content)
     {
         $this->addFlashMessage($flash_type, $flash_content);
 

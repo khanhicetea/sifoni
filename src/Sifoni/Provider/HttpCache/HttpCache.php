@@ -1,21 +1,16 @@
 <?php
 
-namespace Sifoni;
+namespace Sifoni\Provider\HttpCache;
 
-use Silex\Application as SilexApplication;
+use Symfony\Component\HttpKernel\HttpCache\HttpCache as BaseHttpCache;
 use Symfony\Component\HttpFoundation\Request;
 
-class Application extends SilexApplication
+class HttpCache extends BaseHttpCache
 {
-    use SilexApplication\TwigTrait;
-    use SilexApplication\UrlGeneratorTrait;
-    use SilexApplication\MonologTrait;
-    use SilexApplication\TranslationTrait;
-
     /**
-     * Handles the request and delivers the response.
+     * Handles the Request and delivers the Response.
      *
-     * @param Request|null $request Request to process
+     * @param Request $request The Request object
      */
     public function run(Request $request = null, $return_response = false)
     {

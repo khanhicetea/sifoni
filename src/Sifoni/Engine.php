@@ -3,15 +3,17 @@
 namespace Sifoni;
 
 use Silex\Provider\MonologServiceProvider;
-use Silex\Provider\HttpCacheServiceProvider;
 use Silex\Provider\TwigServiceProvider;
 use Silex\Provider\ServiceControllerServiceProvider;
 use Silex\Provider\TranslationServiceProvider;
 use Silex\Provider\HttpFragmentServiceProvider;
 use Silex\Provider\WebProfilerServiceProvider;
 use Silex\Provider\LocaleServiceProvider;
+use Silex\Provider\AssetServiceProvider;
+use Silex\Provider\CsrfServiceProvider;
 use Sifoni\Provider\CapsuleServiceProvider;
 use Sifoni\Provider\SessionServiceProvider;
+use Sifoni\Provider\HttpCacheServiceProvider;
 use Monolog\Logger;
 
 class Engine
@@ -59,7 +61,7 @@ class Engine
      *
      * @return Sifoni\Engine
      */
-    public function init(array $values = array())
+    public function init(array $values = [])
     {
         if ($this->app) {
             return false;
@@ -77,13 +79,13 @@ class Engine
      *
      * @throws Exception
      */
-    public function bootstrap(array $new_options = array())
+    public function bootstrap(array $new_options = [])
     {
         if (!isset($new_options['path.root'])) {
             throw new Exception('Missing path to root dir.');
         }
 
-        $default_options = array(
+        $default_options = [
             'debug' => false,
             'logging' => true,
             'timezone' => 'Asia/Ho_Chi_Minh', // I <3 Vietnam
@@ -92,11 +94,13 @@ class Engine
             'enabled_http_cache' => false,
             'enabled_twig' => true,
             'enabled_session' => true,
-            'enabled_database' => true,
+            'enabled_capsule' => true,
+            'enabled_csrf' => true,
+            'enabled_asset' => true,
             'dir.app' => 'app',
             'dir.storage' => 'storage',
             'app.vendor_name' => 'App',
-        );
+        ];
 
         $options = array_replace($default_options, $new_options);
         foreach ($options as $key => $value) {
@@ -151,14 +155,14 @@ class Engine
 
         $app->register(new ServiceControllerServiceProvider());
 
-        $app['request'] = $app->factory(function($c) {
+        $app['request'] = $app->factory(function ($c) {
             return $c['request_stack']->getCurrentRequest();
         });
 
         if ($app['logging']) {
-            $app->register(new MonologServiceProvider(), array(
+            $app->register(new MonologServiceProvider(), [
                 'monolog.logfile' => $this->getStoragePath('log').DIRECTORY_SEPARATOR.($app['debug'] ? 'debug.log' : 'production.log'),
-            ));
+            ]);
 
             if (!$app['debug']) {
                 $app['monolog.level'] = function () {
@@ -172,34 +176,44 @@ class Engine
         }
 
         if ($app['enabled_twig']) {
-            $app->register(new TwigServiceProvider(), array(
+            $app->register(new TwigServiceProvider(), [
                 'twig.path' => $this->getAppPath('view'),
-            ));
+            ]);
         }
 
         if ($app['enabled_session']) {
             $app->register(new SessionServiceProvider());
         }
 
-        if ($app['enabled_database']) {
+        if ($app['enabled_csrf']) {
+            $app->register(new CsrfServiceProvider());
+        }
+
+        if ($app['enabled_capsule']) {
             $app->register(new CapsuleServiceProvider(), $app['config.database.parameters']);
         }
 
+        if ($app['enabled_asset']) {
+            $app->register(new AssetServiceProvider(), [
+                'assets.version' => time(),
+                'assets.version_format' => '%s?version=%s',
+            ]);
+        }
+
         if ($app['enabled_http_cache']) {
-            $app->register(new HttpCacheServiceProvider(), array(
+            $app->register(new HttpCacheServiceProvider(), [
                 'http_cache.cache_dir' => $this->getStoragePath('cache').DIRECTORY_SEPARATOR,
-            ));
+            ]);
         }
 
         if ($app['debug']) {
             if ($app['web_profiler']) {
-                $app->register(new WebProfilerServiceProvider(), array(
+                $app->register(new WebProfilerServiceProvider(), [
                     'profiler.cache_dir' => $this->getStoragePath('cache').DIRECTORY_SEPARATOR.'profiler'.DIRECTORY_SEPARATOR,
                     'profiler.mount_prefix' => '/_profiler',
-                ));
+                ]);
             }
         }
-
     }
 
     private function loadHooks()
@@ -221,15 +235,15 @@ class Engine
         $app['multi_languages'] = count($languages) > 1;
 
         $app->register(new LocaleServiceProvider());
-        $app->register(new TranslationServiceProvider(), array(
+        $app->register(new TranslationServiceProvider(), [
             'locale_fallbacks' => $languages,
-        ));
+        ]);
 
         $app['translator.domains'] = function () use ($app, $engine) {
-            $translator_domains = array(
-                'messages' => array(),
-                'validators' => array(),
-            );
+            $translator_domains = [
+                'messages' => [],
+                'validators' => [],
+            ];
             $languages = $app['config.app.languages'];
 
             foreach ($languages as $language) {
@@ -250,7 +264,7 @@ class Engine
     private function loadRouting()
     {
         $app = $this->app;
-        $maps = array();
+        $maps = [];
 
         $routing_file_path = $this->getAppPath('config').DIRECTORY_SEPARATOR.'routing.php';
         if (is_readable($routing_file_path)) {
@@ -318,16 +332,11 @@ class Engine
         return $this;
     }
 
-    public function run()
+    public function run($request = null, $send_response = true)
     {
         $app = $this->app;
+        $request_handler = $app['enabled_http_cache'] ? $app['http_cache'] : $app;
 
-        if ($app['enabled_http_cache']) {
-            $app['http_cache']->run();
-        } else {
-            $app->run();
-        }
-
-        return $this;
+        return $request_handler->run($request, $send_response);
     }
 }

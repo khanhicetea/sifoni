@@ -20,7 +20,7 @@ class CapsuleServiceProvider implements ServiceProviderInterface
      **/
     public function register(PimpleContainer $app)
     {
-        $app['capsule.connection_defaults'] = array(
+        $app['capsule.connection_defaults'] = [
             'driver' => 'mysql',
             'host' => 'localhost',
             'database' => null,
@@ -30,7 +30,7 @@ class CapsuleServiceProvider implements ServiceProviderInterface
             'collation' => 'utf8_unicode_ci',
             'prefix' => null,
             'logging' => false,
-        );
+        ];
 
         $app['capsule.container'] = function () {
             return new Container();
@@ -46,6 +46,8 @@ class CapsuleServiceProvider implements ServiceProviderInterface
             };
         }
 
+        $app['capsule.eloquent'] = true;
+
         $app['capsule'] = function ($app) {
             $capsule = new DB($app['capsule.container']);
             $capsule->setEventDispatcher($app['capsule.dispatcher']);
@@ -59,9 +61,9 @@ class CapsuleServiceProvider implements ServiceProviderInterface
             }
 
             if (!isset($app['capsule.connections'])) {
-                $app['capsule.connections'] = array(
-                    'default' => (isset($app['capsule.connection']) ? $app['capsule.connection'] : array()),
-                );
+                $app['capsule.connections'] = [
+                    'default' => (isset($app['capsule.connection']) ? $app['capsule.connection'] : []),
+                ];
             }
 
             foreach ($app['capsule.connections'] as $connection => $options) {
@@ -77,6 +79,13 @@ class CapsuleServiceProvider implements ServiceProviderInterface
                     $capsule->getConnection($connection)->disableQueryLog();
                 }
             }
+
+            $capsule->bootEloquent();
+            $capsule->setAsGlobal();
+
+            $app['db'] = $app->factory(function ($c) {
+                return DB::connection();
+            });
 
             return $capsule;
         };

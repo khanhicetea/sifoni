@@ -1,6 +1,6 @@
 <?php
 
-namespace Sifoni\Adapter;
+namespace Sifoni\Provider\Session;
 
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
@@ -9,7 +9,7 @@ class SifoniSessionStorage extends NativeSessionStorage
 {
     protected $options = [];
 
-    public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)
+    public function __construct(array $options = [], $handler = null, MetadataBag $metaBag = null)
     {
         session_cache_limiter('');
         session_register_shutdown();
@@ -56,7 +56,7 @@ class SifoniSessionStorage extends NativeSessionStorage
 
     public function setOptions(array $options)
     {
-        $validOptions = array(
+        $validOptions = [
             'cache_limiter', 'cookie_domain', 'cookie_httponly',
             'cookie_lifetime', 'cookie_path', 'cookie_secure',
             'entropy_file', 'entropy_length', 'gc_divisor',
@@ -66,7 +66,7 @@ class SifoniSessionStorage extends NativeSessionStorage
             'use_only_cookies', 'use_trans_sid', 'upload_progress.enabled',
             'upload_progress.cleanup', 'upload_progress.prefix', 'upload_progress.name',
             'upload_progress.freq', 'upload_progress.min-freq', 'url_rewriter.tags',
-        );
+        ];
         foreach ($options as $key => $value) {
             if (in_array($key, $validOptions)) {
                 $this->options[$key] = $value;

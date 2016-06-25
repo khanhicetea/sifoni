@@ -9,10 +9,9 @@ use Silex\Provider\Session\SessionListener;
 use Silex\Provider\Session\TestSessionListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Sifoni\Adapter\SifoniSessionStorage;
+use Sifoni\Provider\Session\SifoniSessionStorage;
 
 class SessionServiceProvider implements ServiceProviderInterface, EventListenerProviderInterface
 {
@@ -55,7 +54,7 @@ class SessionServiceProvider implements ServiceProviderInterface, EventListenerP
             return new TestSessionListener($app);
         };
 
-        $app['session.storage.options'] = array();
+        $app['session.storage.options'] = [];
         $app['session.default_locale'] = 'en';
         $app['session.storage.save_path'] = null;
         $app['session.attribute_bag'] = null;
