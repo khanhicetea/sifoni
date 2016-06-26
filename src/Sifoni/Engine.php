@@ -212,8 +212,7 @@ class Engine
 
             if ($app['web_profiler']) {
                 $app->register(new WebProfilerServiceProvider(), [
-                    'profiler.cache_dir' => $this->getStoragePath('cache').DIRECTORY_SEPARATOR.'profiler'.DIRECTORY_SEPARATOR,
-                    'profiler.mount_prefix' => '/_profiler',
+                    'profiler.cache_dir' => $this->getStoragePath('cache').DIRECTORY_SEPARATOR.'profiler'.DIRECTORY_SEPARATOR
                 ]);
             }
         }
@@ -252,8 +251,8 @@ class Engine
             foreach ($languages as $language) {
                 if (is_readable($engine->getAppPath('language').DIRECTORY_SEPARATOR.strtolower($language).'.php')) {
                     $trans = include $engine->getAppPath('language').DIRECTORY_SEPARATOR.strtolower($language).'.php';
-                    $translator_domains['messages'][$language] = $trans['messages'];
-                    $translator_domains['validators'][$language] = $trans['validators'];
+                    $translator_domains['messages'][$language] = isset($trans['messages']) ? $trans['messages'] : [];
+                    $translator_domains['validators'][$language] = isset($trans['validators']) ? $trans['validators'] : [];
                 }
             }
 
@@ -282,7 +281,7 @@ class Engine
                 $map = $this->app['controllers_factory'];
 
                 foreach ($routes as $pattern => $target) {
-                    if ($pattern = '.' && is_callable($target)) {
+                    if ($pattern == '.' && is_callable($target)) {
                         call_user_func($target, $map);
                     } else {
                         $params = is_array($target) ? $target : explode(':', $target);
