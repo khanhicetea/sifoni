@@ -9,8 +9,8 @@ use Sifoni\Exception;
 if (!defined('SIFONI_ENABLED_CAPSULE')) {
     $app = Engine::getInstance()->getApp();
     if (isset($app['capsule'])) {
-        $capsule = $app['capsule'];
         define('SIFONI_ENABLED_CAPSULE', true);
+        $capsule = $app['capsule'];
     } else {
         throw Exception('Please load capsule library before use Eloquent Model !');
     }
