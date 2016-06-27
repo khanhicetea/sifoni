@@ -3,6 +3,7 @@
 namespace Sifoni\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Csrf\CsrfToken;
 use Sifoni\Engine;
 
 abstract class Base
