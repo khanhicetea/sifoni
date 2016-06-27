@@ -16,6 +16,8 @@ use Sifoni\Provider\CapsuleServiceProvider;
 use Sifoni\Provider\SessionServiceProvider;
 use Sifoni\Provider\HttpCacheServiceProvider;
 use Monolog\Logger;
+use Twig_SimpleFunction;
+use Twig_Environment;
 
 class Engine
 {
@@ -188,6 +190,17 @@ class Engine
 
         if ($app['enabled_csrf']) {
             $app->register(new CsrfServiceProvider());
+
+            if ($app['enabled_twig']) {
+                $app['twig'] = $app->extend('twig', function (Twig_Environment $twig, $app) {
+                    $csrf_token = new Twig_SimpleFunction('csrf_token', function ($token_id) use ($app) {
+                        return $app['csrf.token_manager']->getToken($token_id);
+                    });
+                    $twig->addFunction($csrf_token);
+
+                    return $twig;
+                });
+            }
         }
 
         if ($app['enabled_capsule']) {

@@ -78,6 +78,6 @@ abstract class Base
     {
         $token = new CsrfToken($action, $this->request->get($token_name));
 
-        return $this->app['form.csrf_provider']->isTokenValid($token);
+        return $this->app['csrf.token_manager']->isTokenValid($token);
     }
 }
