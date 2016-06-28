@@ -18,7 +18,6 @@
         "symfony/translation": "~2.8|^3.0",
         "symfony/twig-bridge": "~2.8|^3.0",
         "symfony/asset": "~2.8|^3.0",
-        "symfony/var-dumper": "~2.8|^3.0",
         "monolog/monolog": "~1.19",
         "twig/twig": "~1.8|~2.0",
         "silex/web-profiler": "^2.0",
@@ -29,6 +28,7 @@
         "illuminate/cache": "~5.2"
     },
     "require-dev": {
+        "symfony/var-dumper": "~2.8|^3.0",
         "symfony/monolog-bridge": "~2.8|^3.0"
     },
     "autoload": {

@@ -11,7 +11,6 @@ use Silex\Provider\WebProfilerServiceProvider;
 use Silex\Provider\LocaleServiceProvider;
 use Silex\Provider\AssetServiceProvider;
 use Silex\Provider\CsrfServiceProvider;
-use Silex\Provider\VarDumperServiceProvider;
 use Sifoni\Provider\CapsuleServiceProvider;
 use Sifoni\Provider\SessionServiceProvider;
 use Sifoni\Provider\HttpCacheServiceProvider;
@@ -221,8 +220,6 @@ class Engine
         }
 
         if ($app['debug']) {
-            $app->register(new VarDumperServiceProvider());
-
             if ($app['web_profiler']) {
                 $app->register(new WebProfilerServiceProvider(), [
                     'profiler.cache_dir' => $this->getStoragePath('cache').DIRECTORY_SEPARATOR.'profiler'.DIRECTORY_SEPARATOR
