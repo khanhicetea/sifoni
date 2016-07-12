@@ -320,7 +320,7 @@ class Engine
                         }
 
                         if ($prefix_locale != '' && $prefix == '/' && $pattern == '/') {
-                            $app->$method('/', $controller_name.'::'.$action);
+                            $app->match('/', $controller_name.'::'.$action)->method($method);
                         }
                     }
                 }
