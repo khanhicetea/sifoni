@@ -49,6 +49,14 @@ class Engine
 
         return static::$instance;
     }
+    
+    /**
+     * @return void
+     */
+    public static function clearInstance()
+    {
+        static::$instance = null;
+    }
 
     /**
      * @return Sifoni\Application
