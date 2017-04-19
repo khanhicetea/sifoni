@@ -240,7 +240,7 @@ class Engine
     {
         $file_path = $this->getAppPath('config').DIRECTORY_SEPARATOR.'hook.php';
         if (is_readable($file_path)) {
-            include_once $file_path;
+            require $file_path;
         }
     }
 
@@ -288,7 +288,7 @@ class Engine
 
         $routing_file_path = $this->getAppPath('config').DIRECTORY_SEPARATOR.'routing.php';
         if (is_readable($routing_file_path)) {
-            $maps = require_once $routing_file_path;
+            $maps = require $routing_file_path;
         }
 
         if ($maps) {
