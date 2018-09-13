@@ -12,7 +12,7 @@ if (!defined('SIFONI_ENABLED_CAPSULE')) {
         define('SIFONI_ENABLED_CAPSULE', true);
         $capsule = $app['capsule'];
     } else {
-        throw Exception('Please load capsule library before use Eloquent Model !');
+        throw new Exception('Please load capsule library before use Eloquent Model !');
     }
 }
 
